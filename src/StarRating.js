@@ -28,12 +28,14 @@ export default function StartRating({
   className = "",
   message = [],
   defaultRating = 0,
+  onSetRating,
 }) {
-  const [rating, setRating] = useState(defaultRating);
+  const [rating, setRating] = useState(0);
   const [tempRating, setTempRating] = useState(0);
 
   function handleRating(rating) {
     setRating(rating);
+    onSetRating(rating);
   }
 
   const textStyle = {
