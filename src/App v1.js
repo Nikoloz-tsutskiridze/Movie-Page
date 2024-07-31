@@ -98,9 +98,8 @@ export default function App() {
 
           setMovies(data.Search);
         } catch (err) {
-          console.error(err.message);
-
           if (err.name !== "AbortError") {
+            console.log(err.message);
             setError(err.message);
           }
         } finally {
@@ -108,12 +107,13 @@ export default function App() {
         }
       }
 
-      if (query.length < 3) {
+      if (query.length < 2) {
         setMovies([]);
         setError("");
         return;
       }
 
+      handleCloseMovie();
       fetchMovies();
 
       return function () {
@@ -132,7 +132,6 @@ export default function App() {
 
       <Main>
         <Box>
-          {/* {isLoading ? <Loader /> : <MovieList movies={movies} />} */}
           {isLoading && <Loader />}
           {!isLoading && !error && (
             <MovieList movies={movies} onSelectMovie={handleSelectMovie} />
@@ -316,6 +315,23 @@ function MovieDetails({ selectedId, onCloseMovie, onAddWatched, watched }) {
 
   useEffect(
     function () {
+      function callBack(e) {
+        if (e.code === "Escape") {
+          onCloseMovie();
+          console.log("closing");
+        }
+      }
+      document.addEventListener("keydown", callBack);
+
+      return function () {
+        document.removeEventListener("keydown", callBack);
+      };
+    },
+    [onCloseMovie]
+  );
+
+  useEffect(
+    function () {
       async function getMovieDetails() {
         setIsLoading(true);
         const res = await fetch(
@@ -341,7 +357,7 @@ function MovieDetails({ selectedId, onCloseMovie, onAddWatched, watched }) {
 
       return function () {
         document.title = "A.Movies";
-        console.log(`clean up effect for movie ${title}`);
+        // console.log(`clean up effect for movie ${title}`);
       };
     },
     [title]
@@ -401,7 +417,6 @@ function MovieDetails({ selectedId, onCloseMovie, onAddWatched, watched }) {
           <button className="btn-back" onClick={onCloseMovie}>
             &larr;
           </button>
-          {selectedId}
         </>
       )}
     </div>
